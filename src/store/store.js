@@ -1,6 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
-// import { persistStore, persistReducer } from "redux-persist";
-// import storage from "redux-persist/lib/storage";
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import logger from "redux-logger";
 
 import { rootReducer } from "./root-reducer";
@@ -9,18 +18,22 @@ const middleWares = [process.env.NODE_ENV === "development" && logger].filter(
   Boolean
 );
 
-// const persistConfig = {
-//   key: "root",
-//   storage,
-//   blacklist: ["user"],
-// };
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["cart"],
+};
 
-// const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(middleWares),
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(middleWares),
 });
 
-// export const persistor = persistStore(store);
+export const persistor = persistStore(store);
