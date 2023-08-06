@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+
 import {
   getAuth,
   signInWithRedirect,
@@ -9,6 +10,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
+
 import {
   getFirestore,
   doc,
