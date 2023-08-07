@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-
+import fetch from "node-fetch";
 import { selectCartTotal } from "../../store/cart/cart.selector";
 import { selectCurrentUser } from "../../store/user/user.selector";
 
@@ -27,16 +27,13 @@ const PaymentForm = () => {
 
     setIsProcessingPayment(true);
 
-    const response = await fetch(
-      "../../../netlify/functions/create-payment-intent",
-      {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ amount: amount * 100 }),
-      }
-    ).then((res) => res.json());
+    const response = await fetch("/.netlify/functions/create-payment-intent", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount: amount * 100 }),
+    }).then((res) => res.json());
 
     const {
       paymentIntent: { client_secret },
