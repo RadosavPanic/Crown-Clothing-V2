@@ -27,13 +27,16 @@ const PaymentForm = () => {
 
     setIsProcessingPayment(true);
 
-    const response = await fetch("/.netlify/functions/create-payment-intent", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ amount: amount * 100 }),
-    }).then((res) => res.json());
+    const response = await fetch(
+      "https://crown-clothing-e.netlify.app/.netlify/functions/create-payment-intent",
+      {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: amount * 100 }),
+      }
+    ).then((res) => res.json());
 
     const {
       paymentIntent: { client_secret },
