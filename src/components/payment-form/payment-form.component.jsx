@@ -13,6 +13,8 @@ import {
 
 import { BUTTON_TYPE_CLASSES } from "../button/button.component";
 
+const isValidCardElement = (card) => card !== null;
+
 const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
@@ -27,24 +29,25 @@ const PaymentForm = () => {
 
     setIsProcessingPayment(true);
 
-    const response = await fetch(
-      "https://crown-clothing-e.netlify.app/.netlify/functions/create-payment-intent",
-      {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ amount: amount * 100 }),
-      }
-    ).then((res) => res.json());
+    const response = await fetch("/.netlify/functions/create-payment-intent", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount: amount * 100 }),
+    }).then((res) => res.json());
 
     const {
       paymentIntent: { client_secret },
     } = response;
 
+    const cardDetails = elements.getElement(CardElement);
+
+    if (!isValidCardElement(cardDetails)) return;
+
     const paymentResult = await stripe.confirmCardPayment(client_secret, {
       payment_method: {
-        card: elements.getElement(CardElement),
+        card: cardDetails,
         billing_details: {
           name: currentUser ? currentUser : "Guest",
         },
@@ -54,6 +57,7 @@ const PaymentForm = () => {
     setIsProcessingPayment(false);
 
     if (paymentResult.error) {
+      console.log("Radosav Panic", paymentResult.error);
       alert(paymentResult.error);
     } else {
       if (paymentResult.paymentIntent.status === "succeeded") {
